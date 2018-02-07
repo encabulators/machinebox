@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/encabulators/machinebox.svg?branch=master)](https://travis-ci.org/encabulators/machinebox)
+
 # Machinebox Client
 
 **machinebox** is a Rust client for the [machinebox.io](http://machinebox.io) suite of machines.
