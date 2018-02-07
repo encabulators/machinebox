@@ -5,15 +5,16 @@ It provides a simple means of accessing the machines, exposing common functional
 as box-specific functionality. Each "box" or "box type" is separated into its own module and struct.
 
 ## Modules
-The following is a list of the modules corresponding to machinebox types:
+The following is a list of the modules corresponding to machinebox types and which ones
+have been implemented so far:
 
-* **textbox**
-* facebox
-* tagbox
-* videobox
-* nudebox
-* suggestionbox
-* fakebox
+- [X] Textbox
+- [ ] Facebox
+- [ ] Tagbox
+- [ ] Videobox
+- [ ] Nudebox
+- [ ] Suggestionbox
+- [ ] Fakebox
 
 ## Usage
 To use features, simply call the appropriate function on the corresponding box:
@@ -39,3 +40,7 @@ let analysis = tb.check("Pay William $200 tomorrow");
 
 The above code will analyse the phrase `Pay William $200 tomorrow`, flagging 
 `tomorrow` as a date and `200` as an entity of type `money`.
+
+## Notes
+If you run the tests locally, you'll need `RUST_TEST_THREADS=1` because the mock HTTP server
+persists throughout the lifetime of the test run.
