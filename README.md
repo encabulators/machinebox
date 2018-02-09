@@ -15,7 +15,7 @@ have been implemented so far:
 - [ ] Tagbox
 - [ ] Videobox
 - [ ] Nudebox
-- [ ] Suggestionbox
+- [X] Suggestionbox
 - [ ] Fakebox
 
 ## Usage
