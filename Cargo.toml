@@ -1,6 +1,6 @@
 [package]
 name = "machinebox"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Kevin Hoffman <alothien@gmail.com>"]
 description = "A client SDK for communicating with machinebox boxes"
 license = "MPL-2.0"
@@ -9,6 +9,16 @@ documentation = "https://docs.rs/machinebox"
 repository = "https://github.com/encabulators/machinebox"
 readme = "README.md"
 keywords = ["machinebox", "machinelearning", "ML"]
+categories = ["api-bindings", "algorithms", "science", "text-processing"]
+
+include = [
+    "Cargo.toml",
+    "LICENSE.txt",
+    "src/**/*",
+]
+
+[badges]
+travis-ci = { repository = "encabulators/machinebox", branch = "master" }
 
 [dependencies]
 reqwest = "0.8.4"

@@ -8,9 +8,9 @@
 #[macro_use]
 extern crate serde_derive;
 
+extern crate reqwest;
 extern crate serde;
 extern crate serde_json;
-extern crate reqwest;
 
 use reqwest::StatusCode;
 use std::fmt;
@@ -23,13 +23,25 @@ pub struct Error {
 
 impl From<reqwest::Error> for Error {
     fn from(source: reqwest::Error) -> Self {
-        Error { kind: Kind::Reqwest(source) }
+        Error {
+            kind: Kind::Reqwest(source),
+        }
     }
 }
 
 impl From<serde_json::Error> for Error {
     fn from(source: serde_json::Error) -> Self {
-        Error { kind: Kind::Serialization(source)}
+        Error {
+            kind: Kind::Serialization(source),
+        }
+    }
+}
+
+impl From<std::io::Error> for Error {
+    fn from(source: std::io::Error) -> Self {
+        Error {
+            kind: Kind::Io(source),
+        }
     }
 }
 
@@ -39,6 +51,7 @@ impl fmt::Display for Error {
             Kind::Machinebox(ref s) => fmt::Display::fmt(s, f),
             Kind::Serialization(ref e) => fmt::Display::fmt(e, f),
             Kind::Reqwest(ref e) => fmt::Display::fmt(e, f),
+            Kind::Io(ref e) => fmt::Display::fmt(e, f),
         }
     }
 }
@@ -53,6 +66,7 @@ impl std::error::Error for Error {
             Kind::Machinebox(_) => None,
             Kind::Serialization(ref e) => Some(e),
             Kind::Reqwest(ref e) => Some(e),
+            Kind::Io(ref e) => Some(e),
         }
     }
 }
@@ -64,6 +78,7 @@ enum Kind {
     Reqwest(::reqwest::Error),
     Serialization(::serde_json::Error),
     Machinebox(String),
+    Io(::std::io::Error),
 }
 
 type Result<T> = std::result::Result<T, Error>;
@@ -88,7 +103,6 @@ pub struct BoxMetadata {
     pub build: String,
 }
 
-
 /// Structured error information returned when checking the health of a box
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct BoxError {
@@ -108,7 +122,6 @@ pub struct Health {
 /// BoxClient represents the methods that are available on all of the specialized
 /// clients regardless of box type.
 pub trait BoxClient {
-
     /// Provides information about the box
     fn info(&self) -> Result<BoxInfo> {
         let url = format!("{}/info", self.url());
@@ -117,10 +130,10 @@ pub trait BoxClient {
                 let raw = result.text()?;
                 let bi: BoxInfo = serde_json::from_str(&raw)?;
                 Ok(bi)
-            },
-            Err(e) => {
-                Err(Error { kind: Kind::Reqwest(e)} )
             }
+            Err(e) => Err(Error {
+                kind: Kind::Reqwest(e),
+            }),
         }
     }
 
@@ -132,10 +145,10 @@ pub trait BoxClient {
                 let raw = result.text()?;
                 let health: Health = serde_json::from_str(&raw)?;
                 Ok(health)
-            },
-            Err(e) => {
-                Err( Error { kind: Kind::Reqwest(e)} )
             }
+            Err(e) => Err(Error {
+                kind: Kind::Reqwest(e),
+            }),
         }
     }
 
@@ -143,12 +156,10 @@ pub trait BoxClient {
     fn is_live(&self) -> Result<bool> {
         let url = format!("{}/liveness", self.url());
         match reqwest::get(&url) {
-            Ok(response) => {
-                Ok(response.status() == StatusCode::Ok)
-            },
-            Err(e) => {
-                Err( Error { kind: Kind::Reqwest(e)} )
-            }
+            Ok(response) => Ok(response.status() == StatusCode::Ok),
+            Err(e) => Err(Error {
+                kind: Kind::Reqwest(e),
+            }),
         }
     }
 
@@ -157,12 +168,10 @@ pub trait BoxClient {
     fn is_ready(&self) -> Result<bool> {
         let url = format!("{}/readyz", self.url());
         match reqwest::get(&url) {
-            Ok(response) => {
-                Ok(response.status() == StatusCode::Ok)
-            },
-            Err(e) => {
-                Err( Error { kind: Kind::Reqwest(e)})
-            }
+            Ok(response) => Ok(response.status() == StatusCode::Ok),
+            Err(e) => Err(Error {
+                kind: Kind::Reqwest(e),
+            }),
         }
     }
 
@@ -171,12 +180,13 @@ pub trait BoxClient {
 }
 
 pub mod textbox;
+pub mod suggestionbox;
 
 #[cfg(test)]
 mod tests {
     extern crate mockito;
 
-    use self::mockito::{mock, SERVER_URL, reset};
+    use self::mockito::{mock, reset, SERVER_URL};
     use BoxClient;
 
     struct TestClient;
@@ -190,7 +200,8 @@ mod tests {
     #[test]
     fn info_parses() {
         let mock = mock("GET", "/info")
-            .with_body(r#"
+            .with_body(
+                r#"
             {
 	"success": true,
 	"name":    "tagbox",
@@ -198,10 +209,11 @@ mod tests {
 	"build":   "27d1d38",
 	"status":  "ready",
 	"plan": "pro"
-}"#)
+}"#,
+            )
             .create();
         {
-            let t = TestClient{};
+            let t = TestClient {};
             let info = t.info().unwrap();
             assert_eq!(info.success, true);
             assert_eq!(info.name, "tagbox");
@@ -216,7 +228,8 @@ mod tests {
     #[test]
     fn health_parses_no_error() {
         let mock = mock("GET", "/healthz")
-            .with_body(r#"
+            .with_body(
+                r#"
             {
 	"success": true,
 	"hostname": "83b1a33ef322",
@@ -225,10 +238,11 @@ mod tests {
 		"build": "18f2361"
 	},
 	"errors": []
-}"#)
+}"#,
+            )
             .create();
         {
-            let t = TestClient{};
+            let t = TestClient {};
             let health = t.health().unwrap();
             assert_eq!(health.success, true);
             assert_eq!(health.hostname, "83b1a33ef322");
@@ -241,7 +255,8 @@ mod tests {
     #[test]
     fn health_parses_with_error() {
         let mock = mock("GET", "/healthz")
-            .with_body(r#"
+            .with_body(
+                r#"
             {
 	"success": false,
 	"hostname": "83b1a33ef322",
@@ -253,10 +268,11 @@ mod tests {
             "error": "Something went wrong",
             "description": "Something went wrong"
         }]
-    }"#)
+    }"#,
+            )
             .create();
         {
-            let t = TestClient{};
+            let t = TestClient {};
             let health = t.health().unwrap();
             assert_eq!(health.success, false);
             assert_eq!(health.hostname, "83b1a33ef322");
@@ -269,11 +285,9 @@ mod tests {
 
     #[test]
     fn islive_checks_statuscode() {
-        let mock  = mock("GET", "/liveness")
-            .with_status(200)
-            .create();
+        let mock = mock("GET", "/liveness").with_status(200).create();
         {
-            let t = TestClient{};
+            let t = TestClient {};
             let live = t.is_live().unwrap();
             assert_eq!(live, true);
         }
@@ -282,11 +296,9 @@ mod tests {
 
     #[test]
     fn ready_checks_statuscode() {
-        let mock  = mock("GET", "/readyz")
-            .with_status(200)
-            .create();
+        let mock = mock("GET", "/readyz").with_status(200).create();
         {
-            let t = TestClient{};
+            let t = TestClient {};
             let ready = t.is_ready().unwrap();
             assert_eq!(ready, true);
         }
@@ -295,11 +307,9 @@ mod tests {
 
     #[test]
     fn ready_checks_statuscode_fail() {
-        let mock  = mock("GET", "/readyz")
-            .with_status(503)
-            .create();
+        let mock = mock("GET", "/readyz").with_status(503).create();
         {
-            let t = TestClient{};
+            let t = TestClient {};
             let ready = t.is_ready().unwrap();
             assert_eq!(ready, false);
         }

@@ -1,10 +1,13 @@
 //! A client for utilizing the `textbox` machine
 //!
 //! **Textbox** processes text and performs natural language processing, sentiment analysis,
-//! and entity and keyword extraction. For more information, see the [textbox docs](https://machinebox.io/docs/textbox)
+//! and entity and keyword extraction.
+//!
+//! For more information, see the [textbox docs](https://machinebox.io/docs/textbox)
 use super::BoxClient;
 use super::Result;
 use reqwest;
+use reqwest::StatusCode;
 use serde_json;
 use Error;
 use Kind;
@@ -72,19 +75,22 @@ impl Textbox {
         let url = format!("{}/textbox/check", self.url());
         let params = [("text", text)];
         let client = reqwest::Client::new();
-        match client.post(&url)
-            .form(&params)
-            .send()
-            {
-                Ok(mut response) => {
-                    let raw = response.text()?;
+        match client.post(&url).form(&params).send() {
+            Ok(mut response) => {
+                let raw = response.text()?;
+                if response.status() != StatusCode::Ok {
+                    Err(Error {
+                        kind: Kind::Machinebox(format!("HTTP {}: {}", response.status(), raw)),
+                    })
+                } else {
                     let analysis: Analysis = serde_json::from_str(&raw)?;
                     Ok(analysis)
-                },
-                Err(e) => {
-                    Err(Error { kind: Kind::Reqwest(e)} )
                 }
             }
+            Err(e) => Err(Error {
+                kind: Kind::Reqwest(e),
+            }),
+        }
     }
 }
 

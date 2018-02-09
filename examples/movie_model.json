@@ -1,0 +1,139 @@
+{
+  "id": "movie_demo",
+  "name": "Curated Movies",
+  "options": {},
+  "choices": [
+    {
+      "id" : "diehard",
+      "features": [
+        {"key": "genres", "value": "action, christmas", "type": "list"},
+        {"key": "actors", "value": "bruce willis, reginald veljohnson, alan rickman, bonnie bedelia", "type": "list"},
+        {"key": "year", "value": "1988", "type": "number"},
+        {"key": "country", "value": "USA", "type": "keyword"},
+        {"key": "runtime", "value": "132", "type": "number"},
+        {"key": "mpaa", "value": "R", "type": "keyword"}
+      ]
+    },
+    {
+      "id": "princessbride",
+      "features": [
+        {"key": "genres", "value": "adventure, family, fantasy", "type": "list"},
+        {"key": "actors", "value": "cary elwes, mandy patinkin, robin wright", "type": "list"},
+        {"key": "year", "value": "1987", "type": "number"},
+        {"key": "country", "value": "USA", "type": "keyword"},
+        {"key": "runtime", "value": "98", "type": "number"},
+        {"key": "mpaa", "value": "PG", "type": "keyword"}
+      ]
+    },
+    {
+      "id": "goonies",
+      "features": [
+        {"key": "genres", "value": "adventure, comedy, family", "type": "list"},
+        {"key": "actors", "value": "sean astin, josh brolin, joff cohen, corey feldman, kerri green", "type": "list"},
+        {"key": "year", "value": "1985", "type": "number"},
+        {"key": "country", "value": "USA", "type": "keyword"},
+        {"key": "runtime", "value": "114", "type": "number"},
+        {"key": "mpaa", "value": "PG", "type": "keyword"}
+      ]
+    },
+    {
+      "id": "predator",
+      "features": [
+        {"key": "genres", "value": "action, sci-fi, thriller", "type": "list"},
+        {"key": "actors", "value": "arnold schwarzenegger, carl weathers, jesse ventura", "type": "list"},
+        {"key": "year", "value": "1987", "type": "number"},
+        {"key": "country", "value": "USA", "type": "keyword"},
+        {"key": "runtime", "value": "107", "type": "number"},
+        {"key": "mpaa", "value": "R", "type": "keyword"}
+      ]
+    },
+    {
+      "id": "raiders",
+      "features": [
+        {"key": "genres", "value": "action, adventure", "type": "list"},
+        {"key": "actors", "value": "harrison ford, karen allen, paul freeman", "type": "list"},
+        {"key": "year", "value": "1981", "type": "number"},
+        {"key": "country", "value": "USA", "type": "keyword"},
+        {"key": "runtime", "value": "115", "type": "number"},
+        {"key": "mpaa", "value": "PG", "type": "keyword"}
+      ]
+    },
+    {
+      "id": "firstblood",
+      "features": [
+        {"key": "genres", "value": "action, adventure, drama", "type": "list"},
+        {"key": "actors", "value": "sylvester stallone, brian dennehy, richard crenna", "type": "list"},
+        {"key": "year", "value": "1982", "type": "number"},
+        {"key": "country", "value": "USA", "type": "keyword"},
+        {"key": "runtime", "value": "93", "type": "number"},
+        {"key": "mpaa", "value": "R", "type": "keyword"}
+      ]
+    },
+    {
+      "id": "mia",
+      "features": [
+        {"key": "genres", "value": "action, adventure, drama", "type": "list"},
+        {"key": "actors", "value": "chuck norris, m emmet walsh, david tress", "type": "list"},
+        {"key": "year", "value": "1984", "type": "number"},
+        {"key": "country", "value": "USA", "type":"keyword"},
+        {"key": "runtime", "value": "101", "type": "number"},
+        {"key": "mpaa", "value": "R", "type": "keyword"}
+      ]
+    },
+    {
+      "id": "scanners",
+      "features": [
+        {"key": "genres", "value": "horror, sci-fi, thriller", "type": "list"},
+        {"key": "actors", "value": "jennifer oneil, stephen lack, patrick mcgoohan", "type": "list"},
+        {"key": "year", "value": "1981", "type": "number"},
+        {"key": "country", "value": "USA", "type": "keyword"},
+        {"key": "runtime", "value": "103", "type": "number"},
+        {"key": "mpaa", "value": "R", "type": "keyword"}
+      ]
+    },
+    {
+      "id": "gremlins",
+      "features": [
+        {"key": "genres", "value": "comedy, fantasy, horror", "type": "list"},
+        {"key": "actors", "value": "zach galligan, phoebe cates, hoyt axton", "type": "list"},
+        {"key": "year", "value": "1984", "type": "number"},
+        {"key": "country", "value": "USA", "type": "keyword"},
+        {"key": "runtime", "value": "106", "type": "number"},
+        {"key": "mpaa", "value": "PG", "type": "keyword"}
+      ]
+    },
+    {
+      "id": "airplane",
+      "features": [
+        {"key": "genres", "value": "comedy", "type": "list"},
+        {"key": "actors", "value": "robert hays, julie hagerty, leslie nielsen", "type": "list"},
+        {"key": "year", "value": "1980", "type": "number"},
+        {"key": "country", "value": "USA", "type": "keyword"},
+        {"key": "runtime", "value": "88", "type": "number"},
+        {"key": "mpaa", "value": "PG", "type": "keyword"}
+      ]
+    },
+    {
+      "id": "empire",
+      "features": [
+        {"key": "genres", "value": "action, adventure, fantasy", "type": "list"},
+        {"key": "actors", "value": "mark hamill, harrison ford, carrie fisher", "type": "list"},
+        {"key": "year", "value": "1980", "type": "number"},
+        {"key": "country", "value": "USA", "type": "keyword"},
+        {"key": "runtime", "value": "124", "type": "number"},
+        {"key": "mpaa", "value": "PG", "type": "keyword"}
+      ]
+    },
+    {
+      "id": "escapeny",
+      "features": [
+        {"key": "genres", "value": "action, sci-fi", "type": "list"},
+        {"key": "actors", "value": "kurt russell, lee van cleef, ernest borgnine", "type": "list"},
+        {"key": "year", "value": "1981", "type": "number"},
+        {"key": "country", "value": "USA", "type": "keyword"},
+        {"key": "runtime", "value": "99", "type": "number"},
+        {"key": "mpaa", "value": "R", "type": "keyword"}
+      ]
+    }
+  ]
+}
