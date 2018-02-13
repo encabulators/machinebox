@@ -1,10 +1,9 @@
 extern crate machinebox;
 extern crate serde_json;
 
-use std::{thread, time};
+use std::thread;
 use std::time::Duration;
-use machinebox::Error;
-use machinebox::tagbox::{CheckResponse, Tagbox};
+use machinebox::tagbox::Tagbox;
 
 fn main() {
     if let Err(e) = tag_sample() {
