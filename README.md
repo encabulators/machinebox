@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/encabulators/machinebox.svg?branch=master)](https://travis-ci.org/encabulators/machinebox)
 
-# Machinebox Client
+# Machine Box Client
 
 **machinebox** is a Rust client for the [machinebox.io](http://machinebox.io) suite of machines.
 It provides a simple means of accessing the machines, exposing common functionality to all machines as well
@@ -12,7 +12,7 @@ have been implemented so far:
 
 - [X] Textbox
 - [ ] Facebox
-- [ ] Tagbox
+- [X] Tagbox
 - [ ] Videobox
 - [ ] Nudebox
 - [X] Suggestionbox

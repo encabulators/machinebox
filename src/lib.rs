@@ -21,6 +21,14 @@ pub struct Error {
     kind: Kind,
 }
 
+impl Error {
+    pub fn new(msg: &str) -> Error {
+        Error {
+            kind: Kind::Machinebox(msg.to_owned()),
+        }
+    }
+}
+
 impl From<reqwest::Error> for Error {
     fn from(source: reqwest::Error) -> Self {
         Error {
@@ -181,6 +189,8 @@ pub trait BoxClient {
 
 pub mod textbox;
 pub mod suggestionbox;
+pub mod tagbox;
+mod utils;
 
 #[cfg(test)]
 mod tests {

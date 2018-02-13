@@ -17,7 +17,7 @@ pub use self::types::{Prediction, PredictionRequest, PredictionResponse, Reward}
 use std::io::Write;
 use std::collections::HashMap;
 
-/// The client for the `suggestionbox` machinebox.
+/// The client for the `suggestionbox` machine box.
 pub struct Suggestionbox {
     url: String,
 }
