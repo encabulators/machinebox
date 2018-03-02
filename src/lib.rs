@@ -1,15 +1,14 @@
 //! # machinebox
 //!
-//! The `machinebox` create is a simple client SDK that allows Rust developers to consume the
+//! The `machinebox` crate is a simple client SDK that allows Rust developers to consume the
 //! features and functionality exposed by [machinebox](http://machinebox.io) boxes. For
 //! more information on which boxes are available and their functionality, please check
-//! the machinebox.io documentation.
-
-#[macro_use]
-extern crate serde_derive;
+//! the [machinebox.io documentation](https://machinebox.io/docs/).
 
 extern crate reqwest;
 extern crate serde;
+#[macro_use]
+extern crate serde_derive;
 extern crate serde_json;
 
 use reqwest::StatusCode;
@@ -190,6 +189,7 @@ pub trait BoxClient {
 pub mod textbox;
 pub mod suggestionbox;
 pub mod tagbox;
+pub mod facebox;
 mod utils;
 
 #[cfg(test)]

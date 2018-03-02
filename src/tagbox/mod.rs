@@ -3,8 +3,6 @@
 //! **Tagbox** lets you identify the content of images by getting a list of ordered tags.
 //!
 //! For more information, see the [tagbox docs](https://machinebox.io/docs/tagbox)
-extern crate serde;
-
 use std::io::Write;
 use super::BoxClient;
 use super::Result;
@@ -15,10 +13,12 @@ use Error;
 use Kind;
 
 pub use self::types::{CheckResponse, Tag};
-use self::types::{CheckResponseFull, SimilarResponse, TeachResponse, TrainTag, URLWrapper};
+use self::types::{CheckResponseFull, SimilarResponse, TeachResponse, TrainTag};
 
 use super::utils::{delete_with_response, patch_json, post_form_vars, post_json,
-                   post_multipart_file};
+                   post_multipart_file, post_multipart_reader, URLWrapper};
+use std::io::Read;
+use utils::RawBoxResponse;
 
 /// The client for the `tagbox` machine box.
 pub struct Tagbox {
@@ -28,13 +28,19 @@ pub struct Tagbox {
 impl Tagbox {
     /// Creates a new tagbox client connecting to the supplied URL.
     pub fn new(url: &str) -> Tagbox {
-        Tagbox {
-            url: url.to_owned(),
-        }
+        Tagbox { url: url.to_owned() }
+    }
+
+    /// Gets the tags for the image to which `reader` points
+    pub fn check<T: Read + Send + 'static>(&self, reader: T) -> Result<CheckResponse> {
+        let url = format!("{}/tagbox/check", self.url());
+        let raw = post_multipart_reader(&url, reader)?;
+        let checkreply: CheckResponseFull = serde_json::from_str(&raw)?;
+        checkreply.into()
     }
 
     /// Gets the tags for the image at `source_path`
-    pub fn check(&self, source_path: &str) -> Result<CheckResponse> {
+    pub fn check_path(&self, source_path: &str) -> Result<CheckResponse> {
         let url = format!("{}/tagbox/check", self.url());
         let raw = post_multipart_file(&url, source_path)?;
         let checkreply: CheckResponseFull = serde_json::from_str(&raw)?;
@@ -143,19 +149,21 @@ impl Tagbox {
         }
     }
 
-    /// Submits the state file indicated by the `source_path` parameter to the tag box
+    /// Submits the state file indicated by the `source_path` parameter to the tagbox
     pub fn post_state(&self, source_path: &str) -> Result<()> {
         let url = format!("{}/tagbox/state", self.url());
-        let _string = post_multipart_file(&url, source_path)?;
-        Ok(())
+        let raw = post_multipart_file(&url, source_path)?;
+        let state_response:RawBoxResponse = serde_json::from_str(&raw)?;
+        state_response.into()
     }
 
-    /// Submits a state URL to the suggestion box
+    /// Submits a state URL to the tagbox
     pub fn post_state_url(&self, state_url: &str) -> Result<()> {
-        let url = format!("{}/suggestionbox/state", self.url());
+        let url = format!("{}/tagbox/state", self.url());
         let params = [("url", state_url)];
-        let _string = post_form_vars(&url, &params)?;
-        Ok(())
+        let raw = post_form_vars(&url, &params)?;
+        let state_response:RawBoxResponse = serde_json::from_str(&raw)?;
+        state_response.into()
     }
 }
 

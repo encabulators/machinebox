@@ -1,6 +1,6 @@
 [package]
 name = "machinebox"
-version = "0.3.0"
+version = "0.4.0"
 authors = ["Kevin Hoffman <alothien@gmail.com>"]
 description = "A client SDK for communicating with machinebox boxes"
 license = "MPL-2.0"
