@@ -16,6 +16,9 @@ pub use self::types::{Choice, Feature, FeatureType, Model, ModelBuilder, ModelOp
 pub use self::types::{Prediction, PredictionRequest, PredictionResponse, Reward};
 use std::io::Write;
 use std::collections::HashMap;
+use utils::{post_json, delete_with_response, get_json};
+use utils::RawBoxResponse;
+use suggestionbox::types::{ModelList, PredictionResponseFull};
 
 /// The client for the `suggestionbox` machine box.
 pub struct Suggestionbox {
@@ -25,111 +28,49 @@ pub struct Suggestionbox {
 impl Suggestionbox {
     /// Creates a new suggestionbox client
     pub fn new(url: &str) -> Suggestionbox {
-        Suggestionbox {
-            url: url.to_owned(),
-        }
+        Suggestionbox { url: url.to_owned() }
     }
 
     /// Creates a new model and returns a copy of the model as seen by the suggestion
     /// box, including the options used in model generation.
     pub fn create_model(&self, model: &Model) -> Result<Model> {
         let url = format!("{}/suggestionbox/models", self.url());
-        let client = reqwest::Client::new();
-
-        match client.post(&url).json(model).send() {
-            Ok(mut response) => {
-                let raw = response.text()?;
-                if response.status() == StatusCode::Ok {
-                    let newmodel: Model = serde_json::from_str(&raw)?;
-                    Ok(newmodel)
-                } else {
-                    Err(Error {
-                        kind: Kind::Machinebox(raw),
-                    })
-                }
-            }
-            Err(e) => Err(Error {
-                kind: Kind::Reqwest(e),
-            }),
-        }
+        let raw = post_json(&url,model)?;
+        let model:Model = serde_json::from_str(&raw)?;
+        Ok(model)
     }
 
     /// Deletes a model from the box. If the model doesn't exist, it will return
     /// an error of type `Machinebox` indicating an HTTP 404.
     pub fn delete_model(&self, id: &str) -> Result<()> {
         let url = format!("{}/suggestionbox/models/{}", self.url(), id);
-        let client = reqwest::Client::new();
-        match client.delete(&url).send() {
-            Ok(response) => match response.status() {
-                StatusCode::Ok => Ok(()),
-                _ => Err(Error {
-                    kind: Kind::Machinebox(format!("HTTP {}", response.status())),
-                }),
-            },
-            Err(e) => Err(Error {
-                kind: Kind::Reqwest(e),
-            }),
-        }
+        let raw = delete_with_response(&url)?;
+        let raw_response: RawBoxResponse = serde_json::from_str(&raw)?;
+        raw_response.into()
     }
 
     /// Retrieves a single model from the box
     pub fn get_model(&self, id: &str) -> Result<Model> {
         let url = format!("{}/suggestionbox/models/{}", self.url(), id);
-        let client = reqwest::Client::new();
-        match client.get(&url).send() {
-            Ok(mut response) => {
-                let raw = response.text()?;
-                if response.status() != StatusCode::Ok {
-                    Err(Error {
-                        kind: Kind::Machinebox(format!("HTTP {}: {}", response.status(), raw)),
-                    })
-                } else {
-                    let model: Model = serde_json::from_str(&raw)?;
-                    Ok(model)
-                }
-            }
-            Err(e) => Err(Error {
-                kind: Kind::Reqwest(e),
-            }),
-        }
+        let raw = get_json(&url)?;
+        let model: Model = serde_json::from_str(&raw)?;
+        Ok(model)
     }
 
     /// Lists all of the models currently managed by the suggestion box
     pub fn list_models(&self) -> Result<Vec<Model>> {
         let url = format!("{}/suggestionbox/models", self.url());
-        let client = reqwest::Client::new();
-        match client.get(&url).send() {
-            Ok(mut response) => {
-                let raw = response.text()?;
-                let response: self::types::ModelList = serde_json::from_str(&raw)?;
-                Ok(response.models)
-            }
-            Err(e) => Err(Error {
-                kind: Kind::Reqwest(e),
-            }),
-        }
+        let raw = get_json(&url)?;
+        let models:ModelList = serde_json::from_str(&raw)?;
+        models.into()
     }
 
     /// Obtains statistics about the given model
     pub fn get_model_stats(&self, id: &str) -> Result<ModelStats> {
         let url = format!("{}/suggestionbox/models/{}/stats", self.url(), id);
-        let client = reqwest::Client::new();
-        match client.get(&url).send() {
-            Ok(mut response) => {
-                let raw = response.text()?;
-                if response.status() != StatusCode::Ok {
-                    Err(Error {
-                        kind: Kind::Machinebox(format!("HTTP {}: {}", response.status(), raw)),
-                    })
-                } else {
-                    let stats: ModelStats = serde_json::from_str(&raw)?;
-                    Ok(stats)
-                }
-            }
-            Err(e) => Err(Error {
-                kind: Kind::Reqwest(e),
-            }),
-        }
+        let raw = get_json(&url)?;
+        let stats: ModelStats = serde_json::from_str(&raw)?;
+        Ok(stats)
     }
 
     /// Asks the suggestionbox to make a prediction based upon the supplied list of features
@@ -142,23 +83,9 @@ impl Suggestionbox {
         request: &PredictionRequest,
     ) -> Result<PredictionResponse> {
         let url = format!("{}/suggestionbox/models/{}/predict", self.url(), model_id);
-        let client = reqwest::Client::new();
-        match client.post(&url).json(request).send() {
-            Ok(mut response) => {
-                let raw = response.text()?;
-                if response.status() != StatusCode::Ok {
-                    Err(Error {
-                        kind: Kind::Machinebox(format!("HTTP {}: {}", response.status(), raw)),
-                    })
-                } else {
-                    let prediction: PredictionResponse = serde_json::from_str(&raw)?;
-                    Ok(prediction)
-                }
-            }
-            Err(e) => Err(Error {
-                kind: Kind::Reqwest(e),
-            }),
-        }
+        let raw = post_json(&url, request)?;
+        let predict_response: PredictionResponseFull = serde_json::from_str(&raw)?;
+        predict_response.into()
     }
 
     /// Reward tells the suggestionbox about a successful prediction. Rewarding predictions
@@ -170,22 +97,9 @@ impl Suggestionbox {
             value: weight,
         };
         let url = format!("{}/suggestionbox/models/{}/rewards", self.url(), model_id);
-        let client = reqwest::Client::new();
-        match client.post(&url).json(&reward).send() {
-            Ok(mut response) => {
-                let raw = response.text()?;
-                if response.status() != StatusCode::Ok {
-                    Err(Error {
-                        kind: Kind::Machinebox(format!("HTTP {}: {}", response.status(), raw)),
-                    })
-                } else {
-                    Ok(())
-                }
-            }
-            Err(e) => Err(Error {
-                kind: Kind::Reqwest(e),
-            }),
-        }
+        let raw = post_json(&url, &reward)?;
+        let raw_response: RawBoxResponse = serde_json::from_str(&raw)?;
+        raw_response.into()
     }
 
     /// Fills the supplied buffer with the contents of the state file obtained

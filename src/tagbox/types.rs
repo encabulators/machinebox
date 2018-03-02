@@ -17,11 +17,6 @@ pub struct Tag {
     pub id: Option<String>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct URLWrapper {
-    pub url: String,
-}
-
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct CheckResponseFull {
     pub success: bool,

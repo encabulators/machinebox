@@ -11,7 +11,7 @@ The following is a list of the modules corresponding to machinebox types and whi
 have been implemented so far:
 
 - [X] Textbox
-- [ ] Facebox
+- [X] Facebox
 - [X] Tagbox
 - [ ] Videobox
 - [ ] Nudebox

@@ -10,7 +10,7 @@ use std::fs::File;
 
 #[test]
 fn create_model() {
-    let sb = Suggestionbox::new(&SERVER_URL);
+    let sb = Suggestionbox::new(SERVER_URL);
     let mock = mock("POST", "/suggestionbox/models")
         .with_body(
             r#"{
@@ -47,7 +47,7 @@ fn create_model() {
 
 #[test]
 fn get_model() {
-    let sb = Suggestionbox::new(&SERVER_URL);
+    let sb = Suggestionbox::new(SERVER_URL);
     let mock = mock("GET", "/suggestionbox/models/model1")
         .with_body(
             r#"{
@@ -79,7 +79,7 @@ fn get_model() {
 
 #[test]
 fn get_model_reports_failure() {
-    let sb = Suggestionbox::new(&SERVER_URL);
+    let sb = Suggestionbox::new(SERVER_URL);
     let mock = mock("GET", "/suggestionbox/models/model1")
         .with_status(404)
         .create();
@@ -92,7 +92,7 @@ fn get_model_reports_failure() {
 
 #[test]
 fn list_models() {
-    let sb = Suggestionbox::new(&SERVER_URL);
+    let sb = Suggestionbox::new(SERVER_URL);
     let mock = mock("GET", "/suggestionbox/models")
         .with_body(
             r#"{
@@ -132,7 +132,7 @@ fn list_models() {
 
 #[test]
 fn list_models_reports_failure() {
-    let sb = Suggestionbox::new(&SERVER_URL);
+    let sb = Suggestionbox::new(SERVER_URL);
     let mock = mock("GET", "/suggestionbox/models")
         .with_status(500)
         .create();
@@ -145,7 +145,7 @@ fn list_models_reports_failure() {
 
 #[test]
 fn get_model_stats() {
-    let sb = Suggestionbox::new(&SERVER_URL);
+    let sb = Suggestionbox::new(SERVER_URL);
     let mock = mock("GET", "/suggestionbox/models/model1/stats")
         .with_body(
             r#"{
@@ -175,7 +175,7 @@ fn get_model_stats() {
 
 #[test]
 fn get_model_stats_reports_failure() {
-    let sb = Suggestionbox::new(&SERVER_URL);
+    let sb = Suggestionbox::new(SERVER_URL);
     let mock = mock("GET", "/suggestionbox/models/model1/stats")
         .with_status(500)
         .create();
@@ -188,10 +188,11 @@ fn get_model_stats_reports_failure() {
 
 #[test]
 fn predict() {
-    let sb = Suggestionbox::new(&SERVER_URL);
+    let sb = Suggestionbox::new(SERVER_URL);
     let mock = mock("POST", "/suggestionbox/models/model1/predict")
         .with_body(
             r#"{
+            "success": true,
             "choices": [
                 {
                     "id": "choice3",
@@ -220,6 +221,7 @@ fn predict() {
             assert_eq!(prediction.choices.len(), 3);
             assert_eq!(prediction.choices[0].id, "choice3");
             assert_eq!(prediction.choices[1].score, 0.30);
+            assert_eq!(prediction.choices[1].score, 0.30);
             assert_eq!(prediction.choices[2].reward_id, "8678dad8d1d8ad1bef77da");
         }
     }
@@ -228,7 +230,7 @@ fn predict() {
 
 #[test]
 fn predict_reports_failure() {
-    let sb = Suggestionbox::new(&SERVER_URL);
+    let sb = Suggestionbox::new(SERVER_URL);
     let mock = mock("POST", "/suggestionbox/models/model1/predict")
         .with_status(404)
         .create();
@@ -242,9 +244,11 @@ fn predict_reports_failure() {
 
 #[test]
 fn reward() {
-    let sb = Suggestionbox::new(&SERVER_URL);
+    let sb = Suggestionbox::new(SERVER_URL);
     let mock = mock("POST", "/suggestionbox/models/model1/rewards")
         .with_status(200)
+        .with_body(r#"{
+            "success": true }"#)
         .create();
     {
         let res = sb.reward("model1", "8678dad8d1d8ad1bef77da", 1.0);
@@ -255,7 +259,7 @@ fn reward() {
 
 #[test]
 fn reward_reports_failure() {
-    let sb = Suggestionbox::new(&SERVER_URL);
+    let sb = Suggestionbox::new(SERVER_URL);
     let mock = mock("POST", "/suggestionbox/models/model1/rewards")
         .with_status(404)
         .create();
@@ -268,7 +272,7 @@ fn reward_reports_failure() {
 
 #[test]
 fn download_state() {
-    let sb = Suggestionbox::new(&SERVER_URL);
+    let sb = Suggestionbox::new(SERVER_URL);
     let mock = mock("GET", "/suggestionbox/state/model1")
         .with_body("1234512345")
         .create();
@@ -285,7 +289,7 @@ fn download_state() {
 
 #[test]
 fn download_state_reports_error() {
-    let sb = Suggestionbox::new(&SERVER_URL);
+    let sb = Suggestionbox::new(SERVER_URL);
     let mock = mock("GET", "/suggestionbox/state/model1")
         .with_status(404)
         .create();
@@ -299,7 +303,7 @@ fn download_state_reports_error() {
 
 #[test]
 fn post_state() {
-    let sb = Suggestionbox::new(&SERVER_URL);
+    let sb = Suggestionbox::new(SERVER_URL);
     let mock = mock("POST", "/suggestionbox/state")
         .with_body(
             r#"{
@@ -330,7 +334,7 @@ fn post_state() {
 
 #[test]
 fn post_state_reports_failure() {
-    let sb = Suggestionbox::new(&SERVER_URL);
+    let sb = Suggestionbox::new(SERVER_URL);
     let mock = mock("POST", "/suggestionbox/state")
         .with_status(500)
         .create();
@@ -345,7 +349,7 @@ fn post_state_reports_failure() {
 
 #[test]
 fn post_state_url() {
-    let sb = Suggestionbox::new(&SERVER_URL);
+    let sb = Suggestionbox::new(SERVER_URL);
     let mock = mock("POST", "/suggestionbox/state")
         .with_body(
             r#"{
@@ -374,7 +378,7 @@ fn post_state_url() {
 
 #[test]
 fn post_state_url_reports_error() {
-    let sb = Suggestionbox::new(&SERVER_URL);
+    let sb = Suggestionbox::new(SERVER_URL);
     let mock = mock("POST", "/suggestionbox/state")
         .with_status(500)
         .create();

@@ -2,6 +2,7 @@ use super::Result;
 use serde_json;
 use std::fs::File;
 use std::io::Read;
+use super::{Kind, Error};
 
 /// A model represents a single model inside Suggestionbox
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -250,14 +251,56 @@ pub struct ModelStats {
 pub struct ModelList {
     pub models: Vec<Model>,
     pub success: bool,
+    #[serde(default)]
+    pub error: Option<String>,
 }
 
-/// A prediction response produced by the suggestionbox
+impl Into<Result<Vec<Model>>> for ModelList {
+    fn into(self) -> Result<Vec<Model>> {
+        if self.success {
+            Ok(self.models)
+        } else {
+            let s = match self.error {
+                Some(s) => s,
+                None => "Request failed".to_owned(),
+            };
+            Err(Error {
+                kind: Kind::Machinebox(s),
+            })
+        }
+    }
+}
+
 #[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct PredictionResponse {
+pub struct PredictionResponseFull {
+    pub success: bool,
+    #[serde(default)]
+    pub error: Option<String>,
     /// List of predicted choices
     #[serde(default)]
     pub choices: Vec<Prediction>,
+}
+
+impl Into<Result<PredictionResponse>> for PredictionResponseFull {
+    fn into(self) -> Result<PredictionResponse> {
+        if self.success {
+            Ok(PredictionResponse { choices: self.choices })
+        } else {
+            let s = match self.error {
+                Some(s) => s,
+                None => "Request failed".to_owned(),
+            };
+            Err(Error {
+                kind: Kind::Machinebox(s),
+            })
+        }
+    }
+}
+
+/// A prediction response produced by the suggestionbox
+#[derive(Debug, Clone)]
+pub struct PredictionResponse {
+    pub choices: Vec<Prediction>
 }
 
 /// A prediction is a predicted choice
