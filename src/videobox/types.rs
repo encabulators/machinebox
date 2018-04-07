@@ -120,7 +120,7 @@ impl IntoIterator for CheckOptions {
 /// # Examples
 /// ```
 /// use machinebox::videobox::CheckOptionsBuilder;
-/// 
+///
 /// let opts = CheckOptionsBuilder::new()
 ///     .result_duration("1h0m0s")
 ///     .skip_frames(2)
