@@ -13,7 +13,7 @@ have been implemented so far:
 - [X] Textbox
 - [X] Facebox
 - [X] Tagbox
-- [ ] Videobox
+- [X] Videobox
 - [ ] Nudebox
 - [X] Suggestionbox
 - [ ] Fakebox

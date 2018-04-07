@@ -190,6 +190,8 @@ pub mod textbox;
 pub mod suggestionbox;
 pub mod tagbox;
 pub mod facebox;
+pub mod videobox;
+
 mod utils;
 
 #[cfg(test)]
